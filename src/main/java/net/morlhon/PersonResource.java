@@ -13,11 +13,18 @@ import net.morlhon.jersey.Cache;
 public class PersonResource
 {
 
-    @Cache
     @GET
     @Path("/{id}")
+    @Cache
     public Person getPerson(@QueryParam("id") int id)
     {
         return new Person(id);
     }
+
+    @GET
+    public Person getDefaultPerson()
+    {
+        return new Person(0);
+    }
+
 }

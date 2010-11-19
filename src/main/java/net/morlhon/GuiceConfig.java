@@ -12,4 +12,5 @@ public class GuiceConfig extends GuiceServletContextListener
     {
         return Guice.createInjector(new JerseyModule());
     }
+
 }
