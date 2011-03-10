@@ -1,6 +1,8 @@
-package IT.net.morlhon.it;
+package IT.net.morlhon;
 
 import static org.fest.assertions.Assertions.*;
+
+import javax.ws.rs.core.MediaType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +26,7 @@ public class PersonResourceTest
     public void test()
     {
         WebResource resource = client.resource("http://localhost:8081/person/42");
-        ClientResponse clientResponse = resource.get(ClientResponse.class);
+        ClientResponse clientResponse = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertThat(clientResponse.getStatus()).isEqualTo(200);
         assertThat(clientResponse.getHeaders().keySet()).contains("Cache-Control");
         assertThat(clientResponse.getHeaders().get("Cache-Control")).contains("max-age=172800");

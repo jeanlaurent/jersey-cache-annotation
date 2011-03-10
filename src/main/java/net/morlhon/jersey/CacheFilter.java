@@ -1,7 +1,9 @@
 package net.morlhon.jersey;
 
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+import net.morlhon.CacheConfiguration;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -12,13 +14,22 @@ import com.sun.jersey.spi.container.ResourceFilter;
 public class CacheFilter implements ResourceFilter, ContainerResponseFilter
 {
 
-    private CacheControl cacheControl;
+    private CacheConfiguration cacheConfiguration;
 
-    public CacheFilter()
+    public CacheFilter(Class<? extends CacheConfiguration> cacheConfigurationClass)
     {
-        cacheControl = new CacheControl();
-        cacheControl.setNoTransform(false);
-        cacheControl.setMaxAge(172800); // 48h
+        try
+        {
+            cacheConfiguration = cacheConfigurationClass.newInstance();
+        }
+        catch (InstantiationException ie)
+        {
+            throw new RuntimeException(ie);
+        }
+        catch (IllegalAccessException iae)
+        {
+            throw new RuntimeException(iae);
+        }
     }
 
     @Override
@@ -37,9 +48,28 @@ public class CacheFilter implements ResourceFilter, ContainerResponseFilter
     public ContainerResponse filter(ContainerRequest request, ContainerResponse containerResponse)
     {
         Response originalResponse = containerResponse.getResponse();
-        Response cachedResponse = Response.fromResponse(originalResponse).cacheControl(cacheControl).build();
+        ResponseBuilder responseBuilder = Response.fromResponse(originalResponse);
+        assignCacheConfiguration(responseBuilder, cacheConfiguration);
+        Response cachedResponse = responseBuilder.build();
         containerResponse.setResponse(cachedResponse);
         return containerResponse;
     }
 
+    // naive procedural stinky approach.
+    ResponseBuilder assignCacheConfiguration(ResponseBuilder responseBuilder, CacheConfiguration cacheConfiguration)
+    {
+        if (cacheConfiguration.getExpires() != null)
+        {
+            responseBuilder.expires(cacheConfiguration.getExpires());
+        }
+        if (cacheConfiguration.getLastModifiedBy() != null)
+        {
+            responseBuilder.lastModified(cacheConfiguration.getLastModifiedBy());
+        }
+        if (cacheConfiguration.getCacheControl() != null)
+        {
+            responseBuilder.cacheControl(cacheConfiguration.getCacheControl());
+        }
+        return responseBuilder;
+    }
 }

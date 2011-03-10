@@ -15,7 +15,7 @@ public class PersonResource
 
     @GET
     @Path("/{id}")
-    @Cache
+    @Cache(SimpleCacheConfiguration.class)
     public Person getPerson(@QueryParam("id") int id)
     {
         return new Person(id);

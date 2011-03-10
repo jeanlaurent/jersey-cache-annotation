@@ -11,11 +11,12 @@ public class CacheFilterFactory implements ResourceFilterFactory
 {
 
     @Override
-    public List<ResourceFilter> create(AbstractMethod am)
+    public List<ResourceFilter> create(AbstractMethod abstractMethod)
     {
-        if (am.isAnnotationPresent(Cache.class))
+        if (abstractMethod.isAnnotationPresent(Cache.class))
         {
-            return Collections.<ResourceFilter> singletonList(new CacheFilter());
+            Cache annotation = abstractMethod.getAnnotation(Cache.class);
+            return Collections.<ResourceFilter> singletonList(new CacheFilter(annotation.value()));
         }
         return null;
     }

@@ -6,9 +6,11 @@ import static java.lang.annotation.RetentionPolicy.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import net.morlhon.CacheConfiguration;
+
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Cache
 {
-    // expires, cacheControl, last-modifiedby
+    Class<? extends CacheConfiguration> value();
 }
